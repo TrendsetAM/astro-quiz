@@ -1,5 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, ChevronRight, Star, ShieldCheck, Clock, Send, CheckCircle2, Moon, Sun, Lock, BrainCircuit } from 'lucide-react';
+
+// Simple internal icon components to avoid external dependency on lucide-react
+const ChevronRight = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <polyline points="9 18 15 12 9 6" />
+  </svg>
+);
+
+const BrainCircuit = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    width="48"
+    height="48"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M12 3C9 3 7 5 7 8v8c0 3 2 5 5 5s5-2 5-5V8c0-3-2-5-5-5z" />
+    <circle cx="10" cy="8" r="1" />
+    <circle cx="14" cy="10" r="1" />
+    <circle cx="10" cy="14" r="1" />
+    <path d="M10 9v4M14 11v2M12 3v2" />
+  </svg>
+);
+
+const Moon = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M21 12.79A9 9 0 0 1 11.21 3 7 7 0 1 0 21 12.79z" />
+  </svg>
+);
 
 const App = () => {
   const [step, setStep] = useState('welcome');
