@@ -40,7 +40,7 @@ const App = () => {
             </span>
           </div>
           <div className="hidden md:block text-xs uppercase tracking-widest text-slate-500">
-            A Special Message From Stefan
+            A Special Message To You
           </div>
         </div>
       </nav>
