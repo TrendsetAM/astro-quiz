@@ -1,298 +1,219 @@
 import React, { useState, useEffect } from 'react';
-
-// Simple internal icon components to avoid external dependency on lucide-react
-const ChevronRight = (props) => (
-  <svg
-    viewBox="0 0 24 24"
-    width="24"
-    height="24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <polyline points="9 18 15 12 9 6" />
-  </svg>
-);
-
-const BrainCircuit = (props) => (
-  <svg
-    viewBox="0 0 24 24"
-    width="48"
-    height="48"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="M12 3C9 3 7 5 7 8v8c0 3 2 5 5 5s5-2 5-5V8c0-3-2-5-5-5z" />
-    <circle cx="10" cy="8" r="1" />
-    <circle cx="14" cy="10" r="1" />
-    <circle cx="10" cy="14" r="1" />
-    <path d="M10 9v4M14 11v2M12 3v2" />
-  </svg>
-);
-
-const Moon = (props) => (
-  <svg
-    viewBox="0 0 24 24"
-    width="24"
-    height="24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="M21 12.79A9 9 0 0 1 11.21 3 7 7 0 1 0 21 12.79z" />
-  </svg>
-);
+import { Sparkles, PlayCircle, ShieldCheck, ArrowRight, Zap, Info, Lock, Volume2 } from 'lucide-react';
 
 const App = () => {
-  const [step, setStep] = useState('welcome');
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [progress, setProgress] = useState(0);
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [aiResponse, setAiResponse] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
-  // CONFIGURATION
-  const SALES_PAGE_URL = "https://your-sales-page-url.com";
-  const apiKey = ""; // The environment provides this at runtime
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
 
-  const questions = [
-    {
-      id: 'sun_sign',
-      question: "What is your Sun Sign?",
-      options: ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'],
-      type: 'grid'
-    },
-    {
-      id: 'focus',
-      question: "Which area of your life needs the most cosmic clarity right now?",
-      options: ['Love & Relationships', 'Career & Wealth', 'Personal Growth', 'Health & Energy'],
-      type: 'list'
-    },
-    {
-      id: 'struggle',
-      question: "Do you feel like you've been 'stuck' lately?",
-      options: ['Yes, definitely', 'Sometimes', 'I feel a shift coming', 'Not really'],
-      type: 'list'
-    },
-    {
-      id: 'goal',
-      question: "In 12 months, where do you want to be?",
-      options: ['Financially Independent', 'In a Soulmate Connection', 'Living my True Purpose', 'At Peace with my Past'],
-      type: 'list'
+  const handleRedirect = (e) => {
+    // Prevent any default browser behavior
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
     }
-  ];
-
-  const generateAIReading = async (userAnswers) => {
-    setIsGenerating(true);
-    const prompt = `User is a ${userAnswers.sun_sign} focusing on ${userAnswers.focus}. 
-    They feel ${userAnswers.struggle} and want to be ${userAnswers.goal} in 12 months. 
-    Write a 3-sentence "Cosmic Teaser" for their 2026 forecast. 
-    Tone: Mystical, scarily accurate, encouraging but urgent. 
-    Do not use generic fluff. Mention a specific "alignment" or "planetary shift" related to their sign.`;
-
-    try {
-      let retries = 0;
-      const maxRetries = 5;
-      
-      const callApi = async () => {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            systemInstruction: { parts: [{ text: "You are an elite Vedic and Western Astrologer. You provide short, high-impact readings that make users feel deeply seen." }] }
-          })
-        });
-        
-        if (!response.ok) throw new Error('API Error');
-        const data = await response.json();
-        return data.candidates?.[0]?.content?.parts?.[0]?.text;
-      };
-
-      // Simple exponential backoff
-      while (retries < maxRetries) {
-        try {
-          const text = await callApi();
-          setAiResponse(text);
-          break;
-        } catch (e) {
-          retries++;
-          await new Promise(res => setTimeout(res, Math.pow(2, retries) * 1000));
-        }
-      }
-    } catch (err) {
-      setAiResponse("Your 2026 alignment shows a massive shift in your primary house of influence. Your full blueprint is ready below.");
-    } finally {
-      setIsGenerating(false);
-    }
+    
+    const destination = "https://62ccdfv-y4u16yp0-bu913nhrg.hop.clickbank.net";
+    
+    // Primary redirection method
+    window.location.assign(destination);
+    
+    // Fallback if assign fails or is intercepted
+    setTimeout(() => {
+      window.location.href = destination;
+    }, 100);
   };
-
-  const handleStart = () => {
-    setStep('quiz');
-    setProgress((1 / questions.length) * 100);
-  };
-
-  const handleAnswer = (answer) => {
-    const newAnswers = { ...answers, [questions[currentQuestion].id]: answer };
-    setAnswers(newAnswers);
-
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-      setProgress(((currentQuestion + 2) / questions.length) * 100);
-    } else {
-      setStep('loading');
-      startAnalysis(newAnswers);
-    }
-  };
-
-  const startAnalysis = (finalAnswers) => {
-    let p = 0;
-    const interval = setInterval(() => {
-      p += 1;
-      setProgress(p);
-      if (p >= 100) {
-        clearInterval(interval);
-        // Start AI generation in background so it's ready for the next step
-        generateAIReading(finalAnswers);
-        setTimeout(() => setStep('optin'), 500);
-      }
-    }, 30);
-  };
-
-  const handleFinalSubmit = (e) => {
-    e.preventDefault();
-    if (!email) return;
-    setStep('results-teaser');
-  };
-
-  const renderOptIn = () => (
-    <div className="max-w-xl mx-auto px-4 py-12 text-center">
-      <div className="bg-indigo-600/20 border border-indigo-500/30 rounded-2xl p-8 shadow-2xl backdrop-blur-sm">
-        <h2 className="text-3xl font-serif text-white mb-2">Analysis Complete!</h2>
-        <p className="text-indigo-200 mb-8">
-          We've mapped your <strong>{answers.sun_sign}</strong> transits. Where should we send your full 12-month blueprint?
-        </p>
-        
-        <form className="space-y-4" onSubmit={handleFinalSubmit}>
-          <input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="First Name" className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-4 text-white placeholder-indigo-300/50" />
-          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email Address" className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-4 text-white placeholder-indigo-300/50" />
-          <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center space-x-2">
-            <span>Get My Cosmic Reading</span>
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-
-  const renderResultsTeaser = () => (
-    <div className="max-w-2xl mx-auto px-4 py-12 text-center">
-      <div className="bg-gradient-to-b from-indigo-900/40 to-transparent p-1 rounded-3xl mb-8">
-        <div className="bg-[#050510] rounded-[22px] p-8 border border-indigo-500/30">
-          <div className="flex justify-center mb-6">
-            <BrainCircuit className="w-12 h-12 text-indigo-400 animate-pulse" />
-          </div>
-          <h2 className="text-2xl font-serif text-white mb-6">Personal Insight for {name || 'you'}:</h2>
-          
-          {isGenerating ? (
-            <div className="space-y-2 animate-pulse">
-              <div className="h-4 bg-white/5 rounded w-3/4 mx-auto"></div>
-              <div className="h-4 bg-white/5 rounded w-5/6 mx-auto"></div>
-              <div className="h-4 bg-white/5 rounded w-2/3 mx-auto"></div>
-            </div>
-          ) : (
-            <p className="text-xl text-indigo-100 italic leading-relaxed font-light mb-8">
-              "{aiResponse}"
-            </p>
-          )}
-
-          <div className="pt-6 border-t border-white/10">
-            <p className="text-indigo-200/60 mb-6 text-sm">
-              This is just the surface. Your full 100+ page **Akasha Blueprint** contains the exact dates for your 2026 breakthroughs.
-            </p>
-            <button 
-              onClick={() => window.location.href = SALES_PAGE_URL}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-5 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 text-lg flex items-center justify-center group"
-            >
-              <span>Access My Full 12-Month Blueprint</span>
-              <ChevronRight className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
-        </div>
-      </div>
-      <p className="text-white/40 text-xs">Securely redirected to results page in 10... 9...</p>
-    </div>
-  );
-
-  const renderWelcome = () => (
-    <div className="max-w-3xl mx-auto text-center px-4 py-20">
-      <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight">
-        Your 2026 Is <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Written.</span>
-      </h1>
-      <p className="text-xl text-indigo-100/80 mb-10 max-w-2xl mx-auto">
-        We use AI-powered transit mapping to reveal the exact cosmic windows for your wealth, love, and purpose.
-      </p>
-      <button onClick={handleStart} className="px-10 py-5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-2xl transition-all flex items-center mx-auto">
-        Analyze My Chart
-        <ChevronRight className="ml-2 w-5 h-5" />
-      </button>
-    </div>
-  );
-
-  const renderQuiz = () => {
-    const q = questions[currentQuestion];
-    return (
-      <div className="max-w-2xl mx-auto px-4 py-12">
-        <div className="w-full bg-white/10 h-1 mb-12 rounded-full overflow-hidden">
-          <div className="bg-indigo-500 h-full transition-all duration-300" style={{ width: `${progress}%` }} />
-        </div>
-        <h2 className="text-3xl font-serif text-white mb-8 text-center">{q.question}</h2>
-        <div className={q.type === 'grid' ? "grid grid-cols-3 gap-3" : "space-y-3"}>
-          {q.options.map((opt) => (
-            <button key={opt} onClick={() => handleAnswer(opt)} className="p-4 border border-white/10 bg-white/5 hover:bg-indigo-600/40 text-white rounded-xl transition-all text-center font-medium">
-              {opt}
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const renderLoading = () => (
-    <div className="max-w-2xl mx-auto text-center px-4 py-20">
-      <div className="w-20 h-20 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-8"></div>
-      <h2 className="text-2xl text-white font-serif">Synthesizing Cosmic Data...</h2>
-      <p className="text-indigo-300/60 mt-4">Consulting your ${answers.sun_sign} alignments.</p>
-    </div>
-  );
 
   return (
-    <div className="min-h-screen bg-[#050510] text-white selection:bg-indigo-500">
-      <nav className="p-6 flex justify-center border-b border-white/5">
-        <div className="flex items-center space-x-2">
-          <Moon className="w-6 h-6 text-indigo-500" />
-          <span className="text-2xl font-serif font-bold tracking-tighter">AKASHA</span>
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-amber-500/30 selection:text-amber-200">
+      {/* Navigation / Header */}
+      <nav className="border-b border-white/5 bg-slate-950/50 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-tr from-amber-400 to-amber-600 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(251,191,36,0.4)]">
+              <Volume2 className="text-slate-950 w-5 h-5" />
+            </div>
+            <span className="font-bold tracking-tight text-xl bg-gradient-to-r from-amber-200 to-amber-500 bg-clip-text text-transparent">
+              FREQUENCY REWIRING
+            </span>
+          </div>
+          <div className="hidden md:block text-xs uppercase tracking-widest text-slate-500">
+            A Special Message From Stefan
+          </div>
         </div>
       </nav>
-      <main>
-        {step === 'welcome' && renderWelcome()}
-        {step === 'quiz' && renderQuiz()}
-        {step === 'loading' && renderLoading()}
-        {step === 'optin' && renderOptIn()}
-        {step === 'results-teaser' && renderResultsTeaser()}
-      </main>
+
+      {/* Hero Section */}
+      <header className="relative pt-16 pb-24 overflow-hidden">
+        {/* Background glow effects */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-amber-500/10 blur-[120px] rounded-full -z-10" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-purple-500/5 blur-[100px] rounded-full -z-10" />
+
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className={`transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            <span className="inline-block px-4 py-1.5 mb-6 rounded-full border border-amber-500/30 bg-amber-500/5 text-amber-400 text-sm font-medium tracking-wide">
+              Important: This is not your fault.
+            </span>
+            
+            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-8 text-white">
+              Why 97% of "Manifestation" Methods <span className="text-amber-400">Fail You</span>... And The 10-Minute "Energy Hack" That Fixes It.
+            </h1>
+
+            <p className="text-xl md:text-2xl text-slate-400 mb-10 leading-relaxed max-w-3xl mx-auto">
+              If you feel like you're stuck in a cycle of bad luck, it's not because you aren't worthy. It's because of the <span className="text-white font-bold italic">"Mind Reaper"</span>—an invisible internal blockage siphoning your abundance.
+            </p>
+
+            <button 
+              type="button"
+              onClick={handleRedirect}
+              className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-slate-900 bg-amber-400 rounded-xl transition-all duration-300 hover:bg-amber-300 hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(251,191,36,0.2)] hover:shadow-[0_25px_50px_rgba(251,191,36,0.3)]"
+            >
+              Discover Your Life Prediction Now
+              <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
+            </button>
+
+            <div className="mt-8 flex flex-col md:flex-row items-center justify-center gap-6 text-slate-500 text-sm italic">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-amber-500/50" /> No Visualization Required
+              </div>
+              <div className="flex items-center gap-2">
+                <PlayCircle className="w-4 h-4 text-amber-500/50" /> Passive Audio Technology
+              </div>
+              <div className="flex items-center gap-2">
+                <Lock className="w-4 h-4 text-amber-500/50" /> Guaranteed Privacy
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* The Core Problem Section */}
+      <section className="py-24 bg-white/[0.02]">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div className="relative">
+              <div className="absolute inset-0 bg-amber-500/20 blur-[80px] -z-10" />
+              <div className="aspect-square bg-slate-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl p-8 flex flex-col justify-center items-center text-center">
+                 <Zap className="w-20 h-20 text-amber-500 mb-6 animate-pulse" />
+                 <h3 className="text-2xl font-bold text-white mb-4">The "Effort Gap"</h3>
+                 <p className="text-slate-400 text-sm leading-relaxed">
+                   Have you ever noticed how some people barely try, yet opportunities flow to them effortlessly? While you work 10x harder and stay stuck? This is the energy mismatch caused by an internal saboteur.
+                 </p>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-3xl font-bold text-white mb-6">Stop Blaming Yourself For "Broken" Results</h2>
+              <div className="space-y-6 text-slate-300">
+                <p>
+                  You've tried the vision boards. You've written the journals. You've meditated until your legs were numb. And yet... nothing changes.
+                </p>
+                <p>
+                  Traditional "Gurus" tell you that you just need to <span className="text-amber-400 italic">believe harder</span>. But that only adds to the frustration. 
+                </p>
+                <p className="font-semibold text-white">
+                  The truth is: You aren't broken. Your internal frequency is simply being siphoned by a blockage that meditation alone cannot reach.
+                </p>
+                <ul className="space-y-4 pt-4">
+                  {[
+                    "No complicated spiritual exercises",
+                    "No 1-hour time commitments",
+                    "No 'fake it till you make it' routines",
+                    "Just 10 minutes of passive listening"
+                  ].map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <div className="mt-1 w-5 h-5 bg-amber-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <div className="w-1.5 h-1.5 bg-amber-500 rounded-full" />
+                      </div>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* The Solution / Bridge */}
+      <section className="py-24">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-4xl font-bold text-white mb-10 italic">"The Universe Has Answered..."</h2>
+          <div className="bg-slate-900/50 border border-white/10 p-8 md:p-12 rounded-3xl backdrop-blur-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4">
+              <Info className="w-6 h-6 text-slate-700" />
+            </div>
+            
+            <p className="text-lg text-slate-300 mb-8 leading-relaxed">
+              Stefan discovered a specific sound frequency—a digital "retuning" process—that is designed to dissolve the "Mind Reaper" on contact. It works at the subconscious level, aligning your internal energy with the frequency of flow while you rest.
+            </p>
+
+            <div className="bg-amber-400/10 border border-amber-500/20 rounded-2xl p-6 mb-10">
+              <p className="text-amber-200 font-medium">
+                "I went from struggling to pay my rent to receiving an unexpected financial windfall just 14 days after starting. It felt like a dam finally broke." 
+                <span className="block mt-2 text-slate-500 text-sm">— Sarah K., Recent Member</span>
+              </p>
+            </div>
+
+            <button 
+              type="button"
+              onClick={handleRedirect}
+              className="w-full md:w-auto px-12 py-5 font-bold text-lg text-slate-900 bg-amber-400 rounded-xl transition-all hover:bg-amber-300 shadow-xl"
+            >
+              Watch The Message & Claim Your Gift
+            </button>
+            <p className="mt-4 text-slate-500 text-xs uppercase tracking-widest">
+              Available For A Limited Time
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Compliance Footer */}
+      <footer className="bg-slate-950 border-t border-white/5 py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-12 mb-12">
+            <div>
+              <h4 className="text-white font-bold mb-4 flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-amber-500" />
+                Legal Disclaimers
+              </h4>
+              <p className="text-slate-500 text-sm leading-relaxed mb-4">
+                The content on this website and the referenced program are provided for <strong>educational and entertainment purposes only</strong>. Individual results vary and are not guaranteed. There is no guarantee that you will earn money or experience specific life changes.
+              </p>
+              <p className="text-slate-500 text-sm leading-relaxed">
+                This frequency methodology is not intended to diagnose, treat, cure, or prevent any disease. Always seek the advice of your physician or other qualified health care provider with any questions you may have regarding a medical or mental health condition.
+              </p>
+            </div>
+            <div className="space-y-4">
+              <div className="p-4 bg-slate-900/50 rounded-lg border border-white/5">
+                <p className="text-slate-500 text-xs">
+                  <strong>Age Restriction:</strong> By using this site, you certify that you are at least 18 years of age.
+                </p>
+              </div>
+              <div className="p-4 bg-slate-900/50 rounded-lg border border-white/5">
+                <p className="text-slate-500 text-xs">
+                  <strong>Liability:</strong> The website and its contents are provided "as is". The provider is not responsible for any damages resulting from the use or misuse of the information provided.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+            <p className="text-slate-600 text-xs">
+              &copy; 2026 Frequency Rewiring. All Rights Reserved.
+            </p>
+            <div className="flex gap-6 text-xs text-slate-500 underline underline-offset-4">
+              <a href="#" className="hover:text-amber-400">Privacy Policy</a>
+              <a href="#" className="hover:text-amber-400">Terms of Service</a>
+              <a href="#" className="hover:text-amber-400">Earnings Disclaimer</a>
+              <a href="#" className="hover:text-amber-400">Contact Us</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
