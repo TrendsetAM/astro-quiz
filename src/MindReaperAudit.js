@@ -65,7 +65,7 @@ const App = () => {
     }, 3000);
   };
 
-  const affiliateLink = "https://hop.clickbank.net/?affiliate=XXXX&vendor=epcmiracle";
+  const affiliateLink = "https://62ccdfv-y4u16yp0-bu913nhrg.hop.clickbank.net";
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-white font-sans p-4 flex flex-col items-center justify-center">
